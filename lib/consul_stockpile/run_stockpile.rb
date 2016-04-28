@@ -1,5 +1,7 @@
 require 'consul_stockpile/base'
 require 'concurrent'
+require 'consul_stockpile/bootstrap_consul_kv_actor'
+require 'consul_stockpile/watch_event_actor'
 
 module ConsulStockpile
   class RunStockpile < Base
@@ -24,6 +26,11 @@ module ConsulStockpile
       end
 
       begin
+        bootstrap_actor = BootstrapConsulKVActor.spawn
+        bootstrap_actor << :bootstrap
+
+        WatchEventActor.spawn
+
         while readable_io = IO.select([self_read])
           signal = readable_io.first[0].gets.strip
           handle_signal(signal)
