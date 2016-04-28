@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'consul_stockpile/cli'
+
+ConsulStockpile::CLI.start
