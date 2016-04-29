@@ -20,40 +20,39 @@ module ConsulStockpile
     def call
       puts "Watching for event: #{EVENT}"
 
-      begin
+      response = Excon.get(
+        URL,
+        query: {name: EVENT},
+        expects: [200],
+        connect_timeout: 5,
+        read_timeout: 5,
+        write_timeout: 5,
+        tcp_nodelay: true
+      )
+
+      handle_events(response.body)
+
+      loop do
+        index = response.headers['X-Consul-Index']
         response = Excon.get(
           URL,
-          query: {name: EVENT},
+          query: {name: EVENT, index: index},
           expects: [200],
           connect_timeout: 5,
-          read_timeout: 5,
+          read_timeout: 86400,
           write_timeout: 5,
           tcp_nodelay: true
         )
 
         handle_events(response.body)
-
-        loop do
-          index = response.headers['X-Consul-Index']
-          response = Excon.get(
-            URL,
-            query: {name: EVENT, index: index},
-            expects: [200],
-            connect_timeout: 5,
-            read_timeout: 86400,
-            write_timeout: 5,
-            tcp_nodelay: true
-          )
-
-          handle_events(response.body)
-        end
       end
-
     end
 
     private
     def handle_events(events)
       events = JSON.parse(events)
+      return if events.empty?
+
       sift(events) do |event|
         handler.call(event)
       end
@@ -61,19 +60,21 @@ module ConsulStockpile
 
     def sift(events)
       with_lock do
-        last_worked = Diplomat::Kv.get(KEY)
-        last_worked = last_worked.to_i
+        last_worked = Diplomat::Kv.get(KEY, {}, :return)
+        last_worked = last_worked.to_i unless last_worked.nil?
+
+        puts "Last worked: #{last_worked}"
 
         event = events.last
         puts "Sifting event: #{event.inspect}"
         ltime = event['LTime']
         if last_worked.nil? || ltime > last_worked
           yield event
+
+          Diplomat::Kv.put(KEY, ltime.to_s)
         else
           puts 'Skipping duplicate event'
         end
-
-        Diplomat::Kv.put(KEY, ltime.to_s)
       end
     end
 
