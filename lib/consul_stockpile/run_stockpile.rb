@@ -26,10 +26,10 @@ module ConsulStockpile
       end
 
       begin
-        bootstrap_actor = BootstrapConsulKVActor.spawn
+        bootstrap_actor = BootstrapConsulKVActor.spawn(:bootstrap_consul_kv)
         bootstrap_actor << :bootstrap
 
-        WatchEventActor.spawn
+        WatchEventActor.spawn(:watch_event)
 
         while readable_io = IO.select([self_read])
           signal = readable_io.first[0].gets.strip
