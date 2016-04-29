@@ -63,8 +63,6 @@ module ConsulStockpile
         last_worked = Diplomat::Kv.get(KEY, {}, :return)
         last_worked = last_worked.to_i unless last_worked.nil?
 
-        puts "Last worked: #{last_worked}"
-
         event = events.last
         puts "Sifting event: #{event.inspect}"
         ltime = event['LTime']
