@@ -2,6 +2,7 @@ require 'consul_stockpile/base'
 require 'excon'
 require 'json'
 require 'diplomat'
+require 'consul_stockpile/consul_lock'
 
 module ConsulStockpile
   class WatchEvent < Base
@@ -9,7 +10,6 @@ module ConsulStockpile
     URL = 'http://127.0.0.1:8500/v1/event/list'.freeze
     KEY = 'event/kv_update'.freeze
     LOCK_KEY = 'event/kv_update/lock'.freeze
-    SESSION_NAME = 'kv_update_event_lock'.freeze
 
     attr_accessor :handler
 
@@ -59,9 +59,9 @@ module ConsulStockpile
     end
 
     def sift(events)
-      with_lock do
+      ConsulLock.with_lock(key: LOCK_KEY) do
         last_worked = Diplomat::Kv.get(KEY, {}, :return)
-        last_worked = last_worked.to_i unless last_worked.nil?
+        last_worked = last_worked.to_i unless last_worked.empty?
 
         event = events.last
         puts "Sifting event: #{event.inspect}"
@@ -73,20 +73,6 @@ module ConsulStockpile
         else
           puts 'Skipping duplicate event'
         end
-      end
-    end
-
-    def with_lock
-      sessionid = nil
-      locked = false
-      sessionid = Diplomat::Session.create(Name: SESSION_NAME)
-      locked = Diplomat::Lock.wait_to_acquire(LOCK_KEY, sessionid)
-
-      yield
-    ensure
-      if sessionid != nil
-        Diplomat::Lock.release(LOCK_KEY, sessionid) if locked
-        Diplomat::Session.destroy(sessionid)
       end
     end
   end
