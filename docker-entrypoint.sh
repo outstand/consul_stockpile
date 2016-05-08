@@ -1,11 +1,17 @@
 #!/bin/dumb-init /bin/sh
 set -e
 
-if consul_stockpile help "$1" 2>&1 | grep -q "consul_stockpile $1"; then
-  set -- consul_stockpile "$@"
+if [ -n "$USE_BUNDLE_EXEC" ]; then
+  STOCKPILE_BINARY="bundle exec consul_stockpile"
+else
+  STOCKPILE_BINARY=consul_stockpile
 fi
 
-if [ "$1" = 'consul_stockpile' ]; then
+if ${STOCKPILE_BINARY} help "$1" 2>&1 | grep -q "consul_stockpile $1"; then
+  set -- ${STOCKPILE_BINARY} "$@"
+fi
+
+if [ "$1" = "${STOCKPILE_BINARY}" ]; then
   # Enable this to run as an unprivileged user
   set -- gosu stockpile "$@"
 

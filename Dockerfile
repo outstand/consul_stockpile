@@ -5,14 +5,18 @@ RUN addgroup stockpile && \
     adduser -S -G stockpile stockpile
 
 RUN apk --no-cache add build-base libxml2-dev libxslt-dev
+
+ENV USE_BUNDLE_EXEC true
+
 COPY Gemfile consul_stockpile.gemspec /consul_stockpile/
 COPY lib/consul_stockpile/version.rb /consul_stockpile/lib/consul_stockpile/
 RUN cd /consul_stockpile \
     && bundle config build.nokogiri --use-system-libraries \
     && bundle install
 COPY . /consul_stockpile/
-RUN cd /consul_stockpile \
-    && bundle exec rake install
+RUN ln -s /consul_stockpile/exe/consul_stockpile /usr/local/bin/consul_stockpile
+
+WORKDIR /consul_stockpile
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 
