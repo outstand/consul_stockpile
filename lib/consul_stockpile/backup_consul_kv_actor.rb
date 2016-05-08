@@ -11,12 +11,14 @@ module ConsulStockpile
 
     def on_message(message)
       if message == :backup
-        begin
-          BackupConsulKV.call(bucket: @bucket, name: @name)
-        rescue => e
-          puts "Warning: #{e.message}; retrying in 5 seconds"
-          puts e.backtrace
-          Concurrent::ScheduledTask.execute(5){ tell :backup }
+        Logger.tagged('Backup') do
+          begin
+            BackupConsulKV.call(bucket: @bucket, name: @name)
+          rescue => e
+            Logger.warn "Warning: #{e.message}; retrying in 5 seconds"
+            Logger.warn e.backtrace
+            Concurrent::ScheduledTask.execute(5){ tell :backup }
+          end
         end
       else
         pass

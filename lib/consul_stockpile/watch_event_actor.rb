@@ -11,14 +11,16 @@ module ConsulStockpile
 
     def on_message(message)
       if message == :watch
-        begin
-          WatchEvent.call(
-            handler: ->(event){ @backup_actor << :backup }
-          )
-        rescue => e
-          puts "Warning: #{e.message}; retrying in 5 seconds"
-          puts e.backtrace
-          Concurrent::ScheduledTask.execute(5){ tell :watch }
+        Logger.tagged('WatchEvent') do
+          begin
+            WatchEvent.call(
+              handler: ->(event){ @backup_actor << :backup }
+            )
+          rescue => e
+            Logger.warn "Warning: #{e.message}; retrying in 5 seconds"
+            Logger.warn e.backtrace
+            Concurrent::ScheduledTask.execute(5){ tell :watch }
+          end
         end
       else
         pass

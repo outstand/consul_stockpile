@@ -19,7 +19,7 @@ module ConsulStockpile
     end
 
     def self.logger
-      Thread.current[:logger] = Logger.new(STDOUT)
+      Thread.current[:logger] = ::Logger.new(STDOUT)
     end
   end
 end

@@ -3,22 +3,36 @@ require 'consul_stockpile/consul_lock'
 require 'consul_stockpile/detect_canary'
 require 'consul_stockpile/download_backup'
 require 'consul_stockpile/load_json_kv'
+require 'consul_stockpile/logger'
+require 'consul_stockpile/place_canary'
 
 module ConsulStockpile
   class BootstrapConsulKV < Base
     LOCK_KEY = 'stockpile/bootstrap'.freeze
 
+    attr_accessor :bucket
+
+    def initialize(bucket:)
+      self.bucket = bucket
+    end
+
     def call
-      puts 'Starting Consul KV Bootstrap...'
+      Logger.tagged('Bootstrap') do
+        Logger.info 'Starting Consul KV Bootstrap...'
 
-      ConsulLock.with_lock(key: LOCK_KEY) do
-        return if DetectCanary.call.exists
+        ConsulLock.with_lock(key: LOCK_KEY) do
+          if DetectCanary.call.exists
+            Logger.info 'Canary detected; skipping bootstrap.'
+            return
+          end
 
-        json = DownloadBackup.call.json_body
-        LoadJsonKV.call(json: json)
+          json = DownloadBackup.call(bucket: bucket).json_body
+          LoadJsonKV.call(json: json)
+          PlaceCanary.call
+        end
+
+        Logger.info 'Bootstrap complete.'
       end
-
-      puts 'Bootstrap complete.'
     end
   end
 end

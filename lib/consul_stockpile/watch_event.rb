@@ -3,6 +3,7 @@ require 'excon'
 require 'json'
 require 'diplomat'
 require 'consul_stockpile/consul_lock'
+require 'consul_stockpile/logger'
 
 module ConsulStockpile
   class WatchEvent < Base
@@ -18,33 +19,35 @@ module ConsulStockpile
     end
 
     def call
-      puts "Watching for event: #{EVENT}"
+      Logger.tagged('WatchEvent') do
+        Logger.info "Watching for event: #{EVENT}"
 
-      response = Excon.get(
-        URL,
-        query: {name: EVENT},
-        expects: [200],
-        connect_timeout: 5,
-        read_timeout: 5,
-        write_timeout: 5,
-        tcp_nodelay: true
-      )
-
-      handle_events(response.body)
-
-      loop do
-        index = response.headers['X-Consul-Index']
         response = Excon.get(
           URL,
-          query: {name: EVENT, index: index},
+          query: {name: EVENT},
           expects: [200],
           connect_timeout: 5,
-          read_timeout: 86400,
+          read_timeout: 5,
           write_timeout: 5,
           tcp_nodelay: true
         )
 
         handle_events(response.body)
+
+        loop do
+          index = response.headers['X-Consul-Index']
+          response = Excon.get(
+            URL,
+            query: {name: EVENT, index: index},
+            expects: [200],
+            connect_timeout: 5,
+            read_timeout: 86400,
+            write_timeout: 5,
+            tcp_nodelay: true
+          )
+
+          handle_events(response.body)
+        end
       end
     end
 
@@ -61,17 +64,19 @@ module ConsulStockpile
     def sift(events)
       ConsulLock.with_lock(key: LOCK_KEY) do
         last_worked = Diplomat::Kv.get(KEY, {}, :return)
-        last_worked = last_worked.to_i unless last_worked.empty?
+        # Work around diplomat returning "" instead of nil
+        last_worked = nil if last_worked.empty?
+        last_worked = last_worked.to_i unless last_worked.nil?
 
         event = events.last
-        puts "Sifting event: #{event.inspect}"
+        Logger.info "Sifting event: #{event.inspect}"
         ltime = event['LTime']
         if last_worked.nil? || ltime > last_worked
           yield event
 
           Diplomat::Kv.put(KEY, ltime.to_s)
         else
-          puts 'Skipping duplicate event'
+          Logger.info 'Skipping duplicate event'
         end
       end
     end

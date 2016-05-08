@@ -1,4 +1,5 @@
 require 'consul_stockpile/base'
+require 'consul_stockpile/logger'
 require 'concurrent'
 require 'consul_stockpile/detect_consul'
 require 'consul_stockpile/bootstrap_consul_kv_actor'
@@ -31,7 +32,7 @@ module ConsulStockpile
 
       begin
         while !DetectConsul.call.running
-          puts 'Local consul agent not detected, sleeping for 5 seconds'
+          Logger.warn 'Local consul agent not detected, sleeping for 5 seconds'
           sleep 5
         end
 
@@ -41,7 +42,11 @@ module ConsulStockpile
           name: self.name
         )
 
-        BootstrapConsulKVActor.spawn(:bootstrap_consul_kv, backup_actor: backup_actor)
+        BootstrapConsulKVActor.spawn(
+          :bootstrap_consul_kv,
+          backup_actor: backup_actor,
+          bucket: self.bucket
+        )
         WatchEventActor.spawn(:watch_event, backup_actor: backup_actor)
 
 
@@ -51,7 +56,7 @@ module ConsulStockpile
         end
 
       rescue Interrupt
-        puts 'Exiting'
+        Logger.info 'Exiting'
         # actors are cleaned up in at_exit handler
         exit 0
       end
