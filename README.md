@@ -29,9 +29,10 @@ Or install it yourself as:
 
 To release a new version:
 - Update the version number in `version.rb`
-- Run `docker run -it --rm outstand/consul_stockpile:latest bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-- Run `docker build -t outstand/consul_stockpile:VERSION -f Dockerfile.release .`
-- Run `docker push outstand/consul_stockpile:VERSION`
+- `docker build -t outstand/consul_stockpile .`
+- `docker run -it --rm -v ~/.gitconfig:/consul_stockpile/.gitconfig -v ~/.gitconfig.user:/consul_stockpile/.gitconfig.user -v ~/.ssh/id_rsa:/root/.ssh/id_rsa -v ~/.gem:/root/.gem outstand/consul_stockpile rake release`
+- `docker build -t outstand/consul_stockpile:VERSION -f Dockerfile.release .`
+- `docker push outstand/consul_stockpile:VERSION`
 
 ## Contributing
 
