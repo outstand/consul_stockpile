@@ -4,7 +4,7 @@ MAINTAINER Ryan Schlesinger <ryan@outstand.com>
 RUN addgroup stockpile && \
     adduser -S -G stockpile stockpile
 
-RUN apk --no-cache add build-base libxml2-dev libxslt-dev
+RUN apk --no-cache add build-base libxml2-dev libxslt-dev openssh
 
 ENV USE_BUNDLE_EXEC true
 
@@ -12,7 +12,8 @@ COPY Gemfile consul_stockpile.gemspec /consul_stockpile/
 COPY lib/consul_stockpile/version.rb /consul_stockpile/lib/consul_stockpile/
 RUN cd /consul_stockpile \
     && bundle config build.nokogiri --use-system-libraries \
-    && bundle install
+    && bundle install \
+    && git config --global push.default simple
 COPY . /consul_stockpile/
 RUN ln -s /consul_stockpile/exe/consul_stockpile /usr/local/bin/consul_stockpile
 
