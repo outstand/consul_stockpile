@@ -23,7 +23,7 @@ module ConsulStockpile
         ConsulLock.with_lock(key: LOCK_KEY) do
           if DetectCanary.call.exists
             Logger.info 'Canary detected; skipping bootstrap.'
-            return
+            return OpenStruct.new(ran_bootstrap: false)
           end
 
           json = DownloadBackup.call(bucket: bucket).json_body
@@ -32,6 +32,7 @@ module ConsulStockpile
         end
 
         Logger.info 'Bootstrap complete.'
+        OpenStruct.new(ran_bootstrap: true)
       end
     end
   end
