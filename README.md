@@ -28,7 +28,7 @@ Or install it yourself as:
 - `docker run -it --rm --net=host -v $(pwd):/consul_stockpile -v fog:/fog -e FOG_LOCAL=true outstand/consul_stockpile start -b bucket -n backup`
 
 To release a new version:
-- Update the version number in `version.rb`
+- Update the version number in `version.rb` and commit the result.
 - `docker build -t outstand/consul_stockpile .`
 - `docker run -it --rm -v ~/.gitconfig:/consul_stockpile/.gitconfig -v ~/.gitconfig.user:/consul_stockpile/.gitconfig.user -v ~/.ssh/id_rsa:/root/.ssh/id_rsa -v ~/.gem:/root/.gem outstand/consul_stockpile rake release`
 - `docker build -t outstand/consul_stockpile:VERSION -f Dockerfile.release .`
