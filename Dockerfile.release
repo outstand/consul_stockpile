@@ -4,7 +4,7 @@ MAINTAINER Ryan Schlesinger <ryan@outstand.com>
 RUN addgroup stockpile && \
     adduser -S -G stockpile stockpile
 
-ENV CONSUL_STOCKPILE_VERSION=0.1.1
+ENV CONSUL_STOCKPILE_VERSION=0.1.2
 
 RUN apk --no-cache add libxml2 libxslt \
     && apk --no-cache add --virtual build-dependencies build-base libxml2-dev libxslt-dev \
