@@ -21,5 +21,12 @@ module ConsulStockpile
         verbose: options[:verbose]
       )
     end
+
+    desc 'bootstrap_external_services', 'Copy external service entries from kv to catalog'
+    def bootstrap_external_services
+      $stdout.sync = true
+      require 'consul_stockpile/bootstrap_external_services'
+      BootstrapExternalServices.call
+    end
   end
 end
