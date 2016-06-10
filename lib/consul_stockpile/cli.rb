@@ -20,13 +20,16 @@ module ConsulStockpile
         name: options[:name],
         verbose: options[:verbose]
       )
+      # actors are cleaned up in at_exit handler
+      exit 0
+    end
     end
 
     desc 'bootstrap_external_services', 'Copy external service entries from kv to catalog'
     def bootstrap_external_services
       $stdout.sync = true
       require 'consul_stockpile/bootstrap_external_services'
-      BootstrapExternalServices.call
+      BootstrapExternalServices.call!
     end
   end
 end

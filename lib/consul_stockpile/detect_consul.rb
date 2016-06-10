@@ -1,8 +1,10 @@
-require 'consul_stockpile/base'
+require 'metaractor'
 require 'excon'
 
 module ConsulStockpile
-  class DetectConsul < Base
+  class DetectConsul
+    include Metaractor
+
     URL = 'http://127.0.0.1:8500/v1/agent/self'.freeze
 
     def call
@@ -19,9 +21,8 @@ module ConsulStockpile
       rescue Excon::Errors::SocketError, Excon::Errors::HTTPStatusError
         running = false
       end
-      OpenStruct.new(
-        running: running
-      )
+
+      context.running = running
     end
   end
 end

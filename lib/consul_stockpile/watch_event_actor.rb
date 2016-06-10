@@ -13,7 +13,7 @@ module ConsulStockpile
       if message == :watch
         Logger.tagged('WatchEvent') do
           begin
-            WatchEvent.call(
+            WatchEvent.call!(
               handler: ->(event){ @backup_actor << :backup }
             )
           rescue => e

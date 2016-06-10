@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'diplomat', '~> 0.17'
   spec.add_runtime_dependency 'fog-aws', '~> 0.9'
   spec.add_runtime_dependency 'mime-types', '~> 3.0'
+  spec.add_runtime_dependency 'metaractor', '~> 0.5'
 
   spec.add_development_dependency "bundler", "~> 1.11"
   spec.add_development_dependency "rake", "~> 10.0"

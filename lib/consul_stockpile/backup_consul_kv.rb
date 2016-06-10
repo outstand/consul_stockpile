@@ -1,18 +1,15 @@
-require 'consul_stockpile/base'
+require 'metaractor'
 require 'consul_stockpile/logger'
 require 'fog/aws'
 require 'fog/local' if ENV['FOG_LOCAL']
 
 module ConsulStockpile
-  class BackupConsulKV < Base
+  class BackupConsulKV
+    include Metaractor
+
     EVENT_KEY = 'event/kv_update'.freeze
 
-    attr_accessor :bucket, :name
-
-    def initialize(bucket:, name:)
-      self.bucket = bucket
-      self.name = name
-    end
+    required :bucket, :name
 
     def call
       Logger.tagged('Backup') do
@@ -50,6 +47,15 @@ module ConsulStockpile
 
         Logger.info 'Backup complete.'
       end
+    end
+
+    private
+    def bucket
+      context.bucket
+    end
+
+    def name
+      context.name
     end
   end
 end

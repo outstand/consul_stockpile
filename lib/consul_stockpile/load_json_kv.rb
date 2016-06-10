@@ -1,13 +1,11 @@
-require 'consul_stockpile/base'
+require 'metaractor'
 require 'consul_stockpile/logger'
 
 module ConsulStockpile
-  class LoadJsonKV < Base
-    attr_accessor :json
+  class LoadJsonKV
+    include Metaractor
 
-    def initialize(json:)
-      self.json = json
-    end
+    required :json
 
     def call
       Logger.info 'Loading json backup into consul kv store'
@@ -19,6 +17,11 @@ module ConsulStockpile
       ary.each do |item|
         Diplomat::Kv.put(item['key'], item['value'])
       end
+    end
+
+    private
+    def json
+      context.json
     end
   end
 end

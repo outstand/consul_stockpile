@@ -15,7 +15,7 @@ module ConsulStockpile
       if message == :bootstrap
         Logger.tagged('Bootstrap') do
           begin
-            ran_bootstrap = BootstrapConsulKV.call(bucket: @bucket).ran_bootstrap
+            ran_bootstrap = BootstrapConsulKV.call!(bucket: @bucket).ran_bootstrap
             @backup_actor << :backup if ran_bootstrap
           rescue => e
             Logger.warn "Warning: #{e.message}; retrying in 5 seconds"

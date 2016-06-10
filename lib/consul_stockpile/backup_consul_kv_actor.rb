@@ -13,7 +13,7 @@ module ConsulStockpile
       if message == :backup
         Logger.tagged('Backup') do
           begin
-            BackupConsulKV.call(bucket: @bucket, name: @name)
+            BackupConsulKV.call!(bucket: @bucket, name: @name)
           rescue => e
             Logger.warn "Warning: #{e.message}; retrying in 5 seconds"
             Logger.warn e.backtrace

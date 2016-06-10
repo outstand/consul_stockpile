@@ -1,4 +1,4 @@
-require 'consul_stockpile/base'
+require 'metaractor'
 require 'consul_stockpile/consul_lock'
 require 'consul_stockpile/detect_canary'
 require 'consul_stockpile/download_backup'
@@ -8,34 +8,38 @@ require 'consul_stockpile/place_canary'
 require 'consul_stockpile/bootstrap_external_services'
 
 module ConsulStockpile
-  class BootstrapConsulKV < Base
+  class BootstrapConsulKV
+    include Metaractor
+
     LOCK_KEY = 'stockpile/bootstrap'.freeze
 
-    attr_accessor :bucket
-
-    def initialize(bucket:)
-      self.bucket = bucket
-    end
+    required :bucket
 
     def call
       Logger.tagged('Bootstrap') do
         Logger.info 'Starting Consul KV Bootstrap...'
 
         ConsulLock.with_lock(key: LOCK_KEY) do
-          if DetectCanary.call.exists
+          if DetectCanary.call!.exists
             Logger.info 'Canary detected; skipping bootstrap.'
-            return OpenStruct.new(ran_bootstrap: false)
+            context.ran_bootstrap = false
+            return
           end
 
-          json = DownloadBackup.call(bucket: bucket).json_body
-          LoadJsonKV.call(json: json)
-          BootstrapExternalServices.call
-          PlaceCanary.call
+          json = DownloadBackup.call!(bucket: bucket).json_body
+          LoadJsonKV.call!(json: json)
+          BootstrapExternalServices.call!
+          PlaceCanary.call!
         end
 
         Logger.info 'Bootstrap complete.'
-        OpenStruct.new(ran_bootstrap: true)
+        context.ran_bootstrap = true
       end
+    end
+
+    private
+    def bucket
+      context.bucket
     end
   end
 end

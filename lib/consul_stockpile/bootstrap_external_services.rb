@@ -1,10 +1,12 @@
-require 'consul_stockpile/base'
+require 'metaractor'
 require 'excon'
 require 'diplomat'
 require 'consul_stockpile/logger'
 
 module ConsulStockpile
-  class BootstrapExternalServices < Base
+  class BootstrapExternalServices
+    include Metaractor
+
     KEY_PREFIX = 'stockpile/external_services'.freeze
     URL = 'http://127.0.0.1:8500/v1/catalog/register'.freeze
 

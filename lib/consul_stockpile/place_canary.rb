@@ -1,7 +1,9 @@
-require 'consul_stockpile/base'
+require 'metaractor'
 
 module ConsulStockpile
-  class PlaceCanary < Base
+  class PlaceCanary
+    include Metaractor
+
     KEY = 'stockpile/canary'.freeze
 
     def call

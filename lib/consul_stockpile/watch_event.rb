@@ -1,4 +1,4 @@
-require 'consul_stockpile/base'
+require 'metaractor'
 require 'excon'
 require 'json'
 require 'diplomat'
@@ -6,17 +6,15 @@ require 'consul_stockpile/consul_lock'
 require 'consul_stockpile/logger'
 
 module ConsulStockpile
-  class WatchEvent < Base
+  class WatchEvent
+    include Metaractor
+
     EVENT = 'kv_update'.freeze
     URL = 'http://127.0.0.1:8500/v1/event/list'.freeze
     KEY = 'event/kv_update'.freeze
     LOCK_KEY = 'event/kv_update/lock'.freeze
 
-    attr_accessor :handler
-
-    def initialize(handler:)
-      self.handler = handler
-    end
+    required :handler
 
     def call
       Logger.tagged('WatchEvent') do
@@ -52,6 +50,10 @@ module ConsulStockpile
     end
 
     private
+    def handler
+      context.handler
+    end
+
     def handle_events(events)
       events = JSON.parse(events)
       return if events.empty?
