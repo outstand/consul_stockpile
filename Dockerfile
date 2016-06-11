@@ -4,7 +4,6 @@ MAINTAINER Ryan Schlesinger <ryan@outstand.com>
 RUN addgroup stockpile && \
     adduser -S -G stockpile stockpile
 
-#RUN apk --no-cache add build-base libxml2-dev libxslt-dev openssh
 RUN apk --no-cache add build-base openssh
 
 ENV USE_BUNDLE_EXEC true
