@@ -25,10 +25,10 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'fog-aws', '~> 0.9'
   spec.add_runtime_dependency 'mime-types', '~> 3.0'
   spec.add_runtime_dependency 'metaractor', '~> 0.5'
+  spec.add_runtime_dependency "fog-local", "~> 0.3"
 
   spec.add_development_dependency "bundler", "~> 1.11"
   spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "fog-local", "~> 0.3"
   spec.add_development_dependency "rspec", "~> 3.4"
   spec.add_development_dependency "fivemat", "~> 1.3"
   spec.add_development_dependency "aruba", "~> 0.14"
