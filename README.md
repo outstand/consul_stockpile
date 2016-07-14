@@ -23,9 +23,9 @@ Or install it yourself as:
 
 ## Development
 
-- `docker volume create --name fog`
+- `docker volume create --name consul_stockpile_fog`
 - `./build_dev.sh`
-- `docker run -it --rm --net=host -v $(pwd):/consul_stockpile -v fog:/fog -e FOG_LOCAL=true outstand/consul_stockpile:dev start -b bucket -n backup`
+- `docker run -it --rm --net=host -v $(pwd):/consul_stockpile -v consul_stockpile_fog:/fog -e FOG_LOCAL=true outstand/consul_stockpile:dev start -b bucket -n backup`
 
 To release a new version:
 - Update the version number in `version.rb` and `Dockerfile.release` and commit the result.
