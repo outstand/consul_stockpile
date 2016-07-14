@@ -20,6 +20,7 @@ module ConsulStockpile
             Concurrent::ScheduledTask.execute(5){ tell :backup }
           end
         end
+        nil
       else
         pass
       end

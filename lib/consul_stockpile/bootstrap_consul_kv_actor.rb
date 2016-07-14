@@ -22,6 +22,7 @@ module ConsulStockpile
             Concurrent::ScheduledTask.execute(5){ tell :bootstrap }
           end
         end
+        nil
       else
         pass
       end
