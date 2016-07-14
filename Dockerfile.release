@@ -4,7 +4,7 @@ MAINTAINER Ryan Schlesinger <ryan@outstand.com>
 RUN addgroup stockpile && \
     adduser -S -G stockpile stockpile
 
-ENV CONSUL_STOCKPILE_VERSION=0.1.3
+ENV CONSUL_STOCKPILE_VERSION=0.1.4
 
 RUN apk --no-cache add --virtual build-dependencies build-base && \
     gem install consul_stockpile -v ${CONSUL_STOCKPILE_VERSION} && \
