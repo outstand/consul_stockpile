@@ -38,14 +38,14 @@ module ConsulStockpile
 
         backup_actor = BackupConsulKVActor.spawn(
           :backup_consul_kv,
-          bucket: self.bucket,
-          name: self.name
+          bucket: bucket,
+          name: name
         )
 
         BootstrapConsulKVActor.spawn(
           :bootstrap_consul_kv,
           backup_actor: backup_actor,
-          bucket: self.bucket
+          bucket: bucket
         )
         WatchEventActor.spawn(:watch_event, backup_actor: backup_actor)
 
