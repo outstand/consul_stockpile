@@ -28,20 +28,20 @@ module ConsulStockpile
           return
         end
 
-        Logger.info "Uploading consul kv backup to bucket #{self.bucket} as #{self.name}"
+        Logger.info "Uploading consul kv backup to bucket #{bucket} as #{name}"
 
         bucket = nil
         if ENV['FOG_LOCAL']
           Logger.debug 'Using fog local storage'
           storage = Fog::Storage.new provider: 'Local', local_root: '/fog'
-          bucket = storage.directories.create(key: self.bucket)
+          bucket = storage.directories.create(key: bucket)
         else
           storage = Fog::Storage.new provider: 'AWS', use_iam_profile: true
-          bucket = storage.directories.get(self.bucket)
+          bucket = storage.directories.get(bucket)
         end
 
         bucket.files.create(
-          key: "#{self.name}.json",
+          key: "#{name}.json",
           body: data.to_json
         )
 
