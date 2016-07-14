@@ -23,7 +23,6 @@ module ConsulStockpile
       # actors are cleaned up in at_exit handler
       exit 0
     end
-    end
 
     desc 'bootstrap_external_services', 'Copy external service entries from kv to catalog'
     def bootstrap_external_services
