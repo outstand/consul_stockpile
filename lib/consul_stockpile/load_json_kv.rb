@@ -5,7 +5,7 @@ module ConsulStockpile
   class LoadJsonKV
     include Metaractor
 
-    required :json
+    optional :json
 
     def call
       Logger.info 'Loading json backup into consul kv store'
