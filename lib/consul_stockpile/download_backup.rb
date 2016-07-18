@@ -10,21 +10,21 @@ module ConsulStockpile
     required :bucket
 
     def call
-      Logger.info "Downloading consul kv backup from bucket #{bucket_name}"
+      Logger.info "Downloading consul kv backup from bucket #{bucket}"
 
-      bucket = nil
+      directory = nil
       if ENV['FOG_LOCAL']
         Logger.debug 'Using fog local storage'
         storage = Fog::Storage.new provider: 'Local', local_root: '/fog'
-        bucket = storage.directories.create(key: bucket_name)
+        directory = storage.directories.create(key: bucket)
       else
         storage = Fog::Storage.new provider: 'AWS', use_iam_profile: true
-        bucket = storage.directories.get(bucket_name)
+        directory = storage.directories.get(bucket)
       end
 
       body = nil
       last_modified = nil
-      bucket.files.each do |file|
+      directory.files.each do |file|
         next if last_modified != nil && file.last_modified < last_modified
         last_modified = file.last_modified
         body = file.body
@@ -36,7 +36,7 @@ module ConsulStockpile
     end
 
     private
-    def bucket_name
+    def bucket
       context.bucket
     end
   end
