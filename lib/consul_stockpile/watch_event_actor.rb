@@ -18,7 +18,7 @@ module ConsulStockpile
             )
           rescue => e
             Logger.warn "Warning: #{e.message}; retrying in 5 seconds"
-            Logger.warn e.backtrace
+            Logger.warn e.backtrace.join("\n")
             Concurrent::ScheduledTask.execute(5){ tell :watch }
           end
         end

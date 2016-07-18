@@ -16,7 +16,7 @@ module ConsulStockpile
             BackupConsulKV.call!(bucket: @bucket, name: @name)
           rescue => e
             Logger.warn "Warning: #{e.message}; retrying in 5 seconds"
-            Logger.warn e.backtrace
+            Logger.warn e.backtrace.join("\n")
             Concurrent::ScheduledTask.execute(5){ tell :backup }
           end
         end
