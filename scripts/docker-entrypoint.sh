@@ -1,4 +1,4 @@
-#!/bin/dumb-init /bin/sh
+#!/bin/sh
 set -e
 
 if [ -n "$USE_BUNDLE_EXEC" ]; then
@@ -8,7 +8,7 @@ else
 fi
 
 if ${BINARY} help "$1" 2>&1 | grep -q "consul_stockpile $1"; then
-  set -- gosu stockpile ${BINARY} "$@"
+  set -- su-exec stockpile ${BINARY} "$@"
 
   if [ -n "$FOG_LOCAL" ]; then
     chown -R stockpile:stockpile /fog

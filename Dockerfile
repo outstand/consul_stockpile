@@ -1,5 +1,5 @@
-FROM outstand/ruby-base:2.3.1-alpine
-MAINTAINER Ryan Schlesinger <ryan@outstand.com>
+FROM outstand/ruby-base:2.5.3-alpine
+LABEL maintainer="Ryan Schlesinger <ryan@outstand.com>"
 
 RUN addgroup stockpile && \
     adduser -S -G stockpile stockpile
@@ -22,6 +22,5 @@ RUN ln -s /consul_stockpile/exe/consul_stockpile /usr/local/bin/consul_stockpile
 
 COPY scripts/docker-entrypoint.sh /docker-entrypoint.sh
 
-ENV DUMB_INIT_SETSID 0
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/sbin/tini", "-g", "--", "/docker-entrypoint.sh"]
 CMD ["help"]
